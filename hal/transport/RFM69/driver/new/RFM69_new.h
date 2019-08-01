@@ -406,6 +406,11 @@ LOCAL bool RFM69_send(const uint8_t recipient, uint8_t *data, const uint8_t len,
                       const rfm69_controlFlags_t flags, const bool increaseSequenceCounter = true);
 
 /**
+* @brief Gets the transmitter and receiver center frequency
+* @return frequencyHz Frequency in Hz
+*/
+LOCAL uint32_t RFM69_getFrequency(void) __attribute__((unused));
+/**
 * @brief Sets the transmitter and receiver center frequency
 * @param frequencyHz Frequency in Hz
 */

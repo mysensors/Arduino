@@ -98,6 +98,11 @@ void _infiniteLoop(void)
 
 void _begin(void)
 {
+#if defined(MY_DIAGNOSTICS)
+	(void)hwInit();
+	diagnosticsRun();
+	_infiniteLoop();
+#endif
 #if defined(MY_CORE_ONLY)
 	// initialize HW and run setup if present
 	(void)hwInit();

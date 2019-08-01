@@ -18,7 +18,7 @@
  *
  * Arduino core for ESP32: https://github.com/espressif/arduino-esp32
  *
- * MySensors ESP32 implementation, Copyright (C) 2017-2018 Olivier Mauti <olivier@mysensors.org>
+ * MySensors ESP32 implementation, Copyright (C) 2017-2019 Olivier Mauti <olivier@mysensors.org>
  *
  */
 
@@ -121,8 +121,16 @@ int8_t hwSleep(const uint8_t interrupt1, const uint8_t mode1, const uint8_t inte
 
 uint16_t hwCPUVoltage(void)
 {
-	// in mV
-	return FUNCTION_NOT_SUPPORTED;
+	// experimental, not documented feature and inaccurate?
+	uint16_t internalBatReading;
+	if (WiFi.status() == 255) {
+		btStart();
+		internalBatReading = rom_phy_get_vdd33();
+		btStop();
+	} else {
+		internalBatReading = rom_phy_get_vdd33();
+	}
+	return internalBatReading;
 }
 
 uint16_t hwCPUFrequency(void)

@@ -134,6 +134,22 @@
 //#define MY_SPECIAL_DEBUG
 
 /**
+ * @def MY_DIAGNOSTICS
+ * @brief Define MY_DIAGNOSTICS to show a diagnostics serial user interface
+ *
+ */
+//#define MY_DIAGNOSTICS
+
+/**
+ * @def MY_DIAGNOSTICS_CRYPTO
+ * @brief Define MY_DIAGNOSTICS_CRYPTO to include crypto testing functions.
+ *
+ * This feature is disabled on AVR architectures due to limited flash/RAM space but can be enabled if needed.
+ *
+ */
+//#define MY_DIAGNOSTICS
+
+/**
  * @def MY_DISABLED_SERIAL
  * @brief Define MY_DISABLED_SERIAL if you want to use the UART TX/RX pins as normal I/O pins.
  *
@@ -2294,6 +2310,8 @@
 #define MY_SPECIAL_DEBUG
 #define MY_DISABLED_SERIAL
 #define MY_SPLASH_SCREEN_DISABLED
+#define MY_DIAGNOSTICS
+#define MY_DIAGNOSTICS_CRYPTO
 // linux
 #define MY_LINUX_SERIAL_PORT
 #define MY_LINUX_SERIAL_IS_PTY

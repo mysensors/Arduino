@@ -424,6 +424,16 @@ LOCAL bool RFM69_send(const uint8_t recipient, uint8_t *data, const uint8_t len,
 	return RFM69_sendFrame(&packet, increaseSequenceCounter);
 }
 
+LOCAL uint32_t RFM69_getFrequency(void)
+{
+	uint32_t freqHz;
+	freqHz = (uint32_t)RFM69_readReg(RFM69_REG_FRFMSB) << 16;
+	freqHz |= RFM69_readReg(RFM69_REG_FRFMID) << 8;
+	freqHz |= RFM69_readReg(RFM69_REG_FRFLSB);
+	freqHz *= RFM69_FSTEP;
+	return freqHz;
+}
+
 LOCAL void RFM69_setFrequency(const uint32_t frequencyHz)
 {
 	const uint32_t freqHz = (uint32_t)(frequencyHz / RFM69_FSTEP);
