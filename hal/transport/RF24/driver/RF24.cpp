@@ -44,7 +44,7 @@ uint8_t RF24_spi_txbuff[32+1]
 
 LOCAL void RF24_csn(const bool level)
 {
-#if defined(__linux__)
+#if !defined(MY_RF24_CS_PIN)
 	(void)level;
 #else
 	hwDigitalWrite(MY_RF24_CS_PIN, level);
@@ -522,7 +522,7 @@ LOCAL bool RF24_initialize(void)
 	hwPinMode(MY_RF24_IRQ_PIN,INPUT);
 #endif
 	hwPinMode(MY_RF24_CE_PIN, OUTPUT);
-#if !defined(__linux__)
+#if defined(MY_RF24_CS_PIN)
 	hwPinMode(MY_RF24_CS_PIN, OUTPUT);
 #endif
 	RF24_ce(LOW);
