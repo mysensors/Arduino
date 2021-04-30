@@ -9,6 +9,7 @@
 // G FEEE DDDD CCCC BBBB BBBB AAAA AAAA
 
 #include <mcp_can.h>
+#include "MyTransportCAN.h"
 #define CAN0_INT 2    // TODO make configurable
 MCP_CAN CAN0(10);     // TODO make configurable
 //since long messages can be sliced and arrive mixed with other messages assemble buffer is required
