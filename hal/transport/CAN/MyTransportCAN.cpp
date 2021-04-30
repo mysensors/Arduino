@@ -62,6 +62,9 @@ bool transportInit(void)
         return false;
     }
     canInitialized=true;
+    for (uint8_t i = 0; i < bufSize; i++) {
+        _cleanSlot(i);
+    }
     _initFilters();
     return true;
 
