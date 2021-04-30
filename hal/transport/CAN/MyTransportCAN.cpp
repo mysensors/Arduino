@@ -167,9 +167,9 @@ bool transportSend(const uint8_t to, const void* data, const uint8_t len, const 
         uint8_t buff[8];
         uint8_t j=0;
 //        memcpy(buff,datap[i*8+j],partlen);
-Serial.print("partLen: ");
+Serial.print("send partLen: ");
 Serial.println(partLen);
-Serial.print("data: ");
+Serial.print("send data: ");
         for (j = 0; j < partLen; j++) {
             buff[j]=datap[i*8+j];
             Serial.print(buff[j]);
@@ -178,18 +178,19 @@ Serial.print("data: ");
 
 
         Serial.println(".");
-        Serial.print("CAN len: ");
+
+        Serial.print("send CAN len: ");
         Serial.println(len);
-        Serial.print("CAN noOfFrames: ");
+        Serial.print("send CAN noOfFrames: ");
         Serial.println(noOfFrames);
-        Serial.print("CAN id: ");
+        Serial.print("send CAN id: ");
         Serial.println(canId);
         byte sndStat = CAN0.sendMsgBuf(canId, partLen, buff);
         if (sndStat == CAN_OK) {
-            Serial.print("packet sent\n");
+            Serial.print("send packet sent\n");
             return true;
         } else {
-            Serial.print("packet send error\n");
+            Serial.print("send packet send error\n");
             return false;
         }
     }
@@ -198,26 +199,25 @@ bool transportDataAvailable(void)
 {
     if(!hwDigitalRead(CAN0_INT))                         // If CAN0_INT pin is low, read receive buffer
     {
-        Serial.print("Read message\n");
         CAN0.readMsgBuf(&rxId, &len, rxBuf);      // Read data: len = data length, buf = data byte(s)
+        Serial.print("READ CAN id: ");
         Serial.println(rxId);
         long unsigned int from=(rxId & 0x000000FF);
-        Serial.print("from: ");
+        Serial.print("READ CAN from: ");
         Serial.println(from);
         long unsigned int to=(rxId & 0x0000FF00)>>8;
-        Serial.print("to: ");
+        Serial.print("READ CAN to: ");
         Serial.println(to);
         long unsigned int currentPart=(rxId & 0x000F0000)>>16;
-        Serial.print("currentPart: ");
+        Serial.print("READ CAN currentPart: ");
         Serial.println(currentPart);
         long unsigned int totalPartCount=(rxId & 0x00F00000)>>20;
-        Serial.print("totalPartCount: ");
+        Serial.print("READ CAN totalPartCount: ");
         Serial.println(totalPartCount);
         long unsigned int messageId=(rxId & 0x07000000)>>24;
-        Serial.print("messageId: ");
+        Serial.print("READ CAN messageId: ");
         Serial.println(messageId);
         uint8_t slot;
-        //TODO should start from 0;
         if(currentPart==0){
             slot=_findCanPacketSlot();
             packets[slot].locked=true;
@@ -226,24 +226,21 @@ bool transportDataAvailable(void)
         }
         if (slot!=bufSize) {
             memcpy(packets[slot].data + packets[slot].len, rxBuf, len);
-            Serial.println("packets start");
-            Serial.println(packets[slot].data[0]);
-            Serial.println(packets[slot].data[1]);
-            Serial.println(packets[slot].data[2]);
-            Serial.println(packets[slot].data[3]);
-            Serial.println(packets[slot].data[4]);
-            Serial.println(packets[slot].data[5]);
-            Serial.println(packets[slot].data[6]);
-            Serial.println("packets end");
             packets[slot].lastReceivedPart++;
             packets[slot].len += len;
-            Serial.print("SLOT: ");
+            Serial.println("READ CAN data: ");
+            for(uint8_t k=0;k<packets[slot].len;k++){
+                Serial.print(packets[slot].data[k]);
+                Serial.print(", ");
+            }
+            Serial.println("");
+            Serial.print("READ CAN SLOT: ");
             Serial.println(slot);
-            Serial.print("lastReceivedPart: ");
+            Serial.print("READ CAN lastReceivedPart: ");
             Serial.println(packets[slot].lastReceivedPart);
             if (packets[slot].lastReceivedPart == totalPartCount) {
                 packets[slot].ready = true;
-                Serial.print("packet received\n");
+                Serial.print("READ CAN packet received\n");
                 return true;
             }
         }
