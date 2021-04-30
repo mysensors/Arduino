@@ -258,16 +258,16 @@ uint8_t transportReceive(void* data)
         }
     }
     if (slot<bufSize) {
-        memcpy(data,packets[i].data,packets[i].len);
-        Serial.println(packets[i].data[0]);
-        Serial.println(packets[i].data[1]);
-        Serial.println(packets[i].data[2]);
-        Serial.println(packets[i].data[3]);
-        Serial.println(packets[i].data[4]);
-        Serial.println(packets[i].data[5]);
-        Serial.println(packets[i].data[6]);
+        memcpy(data,packets[slot].data,packets[slot].len);
+        Serial.print("transport receive data: ");
+        for(uint8_t k=0;k<packets[slot].len;k++){
+            Serial.print(packets[slot].data[k]);
+            Serial.print(", ");
+        }
+        Serial.println("");
+        i=packets[slot].len;
         _cleanSlot(slot);
-        return packets[i].len;
+        return i;
     } else {
         return (0);
     }
