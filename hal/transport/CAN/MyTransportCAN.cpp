@@ -159,7 +159,9 @@ bool transportSend(const uint8_t to, const void* data, const uint8_t len, const 
         canId=canId << 8;
         canId += _nodeId;
         uint8_t partLen;
-        if (i * 8 <= len && noOfFrames!=1) {
+        if (len<=8){
+            partLen=len;
+        } else if (i * 8 <= len) {
             partLen = 8;
         } else {
             partLen = len % 8;
