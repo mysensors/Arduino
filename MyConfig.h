@@ -268,6 +268,12 @@
 //#define MY_RS485
 
 /**
+ * @def MY_CAN
+ * @brief Define this to use the CAN wired transport for sensor network communication.
+ */
+//#define MY_CAN
+
+/**
  * @def MY_RS485_BAUD_RATE
  * @brief The RS485 BAUD rate.
  */
@@ -2275,7 +2281,7 @@
 #endif
 
 // Enable sensor network "feature" if one of the transport types was enabled
-#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485) || defined(MY_PJON)
+#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485) || defined(MY_PJON) || defined(MY_CAN)
 #define MY_SENSOR_NETWORK
 #endif
 
@@ -2443,6 +2449,9 @@
 // PJON
 #define MY_PJON
 #define MY_DEBUG_VERBOSE_PJON
+// CAN
+//TODO add more.
+#define MY_CAN
 // RF24
 #define MY_RADIO_RF24
 #define MY_RADIO_NRF24 //deprecated

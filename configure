@@ -62,7 +62,7 @@ MySensors options:
                                 MQTT publish topic prefix.
     --my-mqtt-subscribe-topic-prefix=<PREFIX>
                                 MQTT subscribe topic prefix.
-    --my-transport=[none|rf24|rfm69|rfm95|rs485]
+    --my-transport=[none|rf24|rfm69|rfm95|rs485|can]
                                 Set the transport to be used to communicate with other nodes. [rf24]
     --my-rf24-channel=<0-125>   RF channel for the sensor net. [76]
     --my-rf24-pa-level=[RF24_PA_MAX|RF24_PA_HIGH|RF24_PA_LOW|RF24_PA_MIN]
@@ -637,6 +637,8 @@ elif [[ ${transport_type} == "rfm95" ]]; then
     CPPFLAGS="-DMY_RADIO_RFM95 $CPPFLAGS"
 elif [[ ${transport_type} == "rs485" ]]; then
     CPPFLAGS="-DMY_RS485 $CPPFLAGS"
+elif [[ ${transport_type} == "can" ]]; then
+    CPPFLAGS="-DMY_CAN $CPPFLAGS"
 else
     die "Invalid transport type." 3
 fi

@@ -290,8 +290,13 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #else
 #define _PJONCNT 0	//!< _PJONCNT
 #endif
+#if defined(MY_CAN)
+#define __CANCNT 1	//!< __CANCNT
+#else
+#define __CANCNT 0	//!< __CANCNT
+#endif
 
-#if (__RF24CNT + __NRF5ESBCNT + __RFM69CNT + __RFM95CNT + __RS485CNT + _PJONCNT > 1)
+#if (__RF24CNT + __NRF5ESBCNT + __RFM69CNT + __RFM95CNT + __RS485CNT + _PJONCNT + __CANCNT> 1)
 #error Only one forward link driver can be activated
 #endif
 #endif //DOXYGEN
@@ -302,7 +307,7 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #endif
 
 // TRANSPORT INCLUDES
-#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485) || defined (MY_PJON)
+#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485) || defined (MY_PJON) || defined(MY_CAN)
 #include "hal/transport/MyTransportHAL.h"
 #include "core/MyTransport.h"
 
@@ -389,6 +394,9 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #elif defined(MY_PJON)
 #include "hal/transport/PJON/driver/PJON.h"
 #include "hal/transport/PJON/driver/PJONSoftwareBitBang.h"
+#elif defined(MY_CAN)
+#include "hal/transport/CAN/MyTransportCAN.cpp"
+#endif
 #if (PJON_BROADCAST == 0)
 #error "You must change PJON_BROADCAST to BROADCAST_ADDRESS (255u) and PJON_NOT_ASSIGNED to other one."
 #endif
