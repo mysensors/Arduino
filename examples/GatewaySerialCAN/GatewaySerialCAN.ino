@@ -38,6 +38,7 @@
 
 // Enable debug prints to serial monitor
 #define MY_DEBUG
+//#define MY_DEBUG_VERBOSE_CAN
 
 
 // Enable and select radio type attached
