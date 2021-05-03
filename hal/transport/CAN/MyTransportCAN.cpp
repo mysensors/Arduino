@@ -16,13 +16,7 @@
 #else
 #define CAN_DEBUG(x,...)	//!< DEBUG null
 #endif
-#define CAN_INT 2    // TODO make configurable
-#define CAN_CS 10
-#define CAN_SPEED CAN_250KBPS
-#define CAN_CLOCK MCP_8MHZ
-MCP_CAN CAN0(CAN_CS);     // TODO make configurable
-//since long messages can be sliced and arrive mixed with other messages assemble buffer is required
-#define CAN_BUF_SIZE 8  //TODO make configurable
+MCP_CAN CAN0(CAN_CS);
 bool canInitialized=false;
 
 //input buffer for raw data (from library).
