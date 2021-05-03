@@ -1,16 +1,3 @@
-// from address 8bits (A)
-// to address 8 bits (B)
-// current part number 4 bits (C)
-// total part count 4 bits (D)
-// 3 bits message_id (E)
-// 1 bit require ack (F)
-// 1 bit is ack (G)
-// 1 bit is extended frame (H). (FIXED)
-// 1 bit RTR (Remote Transmission Request) (I) (FIXED)
-// 1 bit SRR (Substitute Remote Request)  (J) (FIXED)
-// header model (32 bits)
-// HIJG FEEE DDDD CCCC BBBB BBBB AAAA AAAA
-
 #include "hal/transport/CAN/driver/mcp_can.h"
 #include "hal/transport/CAN/driver/mcp_can.cpp"
 #include "MyTransportCAN.h"
@@ -27,6 +14,8 @@ long unsigned int rxId;
 unsigned char len = 0;
 unsigned char rxBuf[8];
 unsigned char _nodeId;
+
+//message id updated for every outgoing mesage
 uint8_t message_id =0;
 
 //buffer element
@@ -41,6 +30,7 @@ typedef struct {
     bool ready;
 } CAN_Packet;
 
+//buffer
 CAN_Packet packets[CAN_BUF_SIZE];
 
 //filter incoming messages (MCP2515 feature)
@@ -131,6 +121,32 @@ uint8_t _findCanPacketSlot(long unsigned int from,long unsigned int currentPart,
     return slot;
 }
 
+// from address 8bits (A)
+// to address 8 bits (B)
+// current part number 4 bits (C)
+// total part count 4 bits (D)
+// 3 bits message_id (E)
+// 1 bit require ack (F)
+// 1 bit is ack (G)
+// 1 bit is extended frame (H). (FIXED)
+// 1 bit RTR (Remote Transmission Request) (I) (FIXED)
+// 1 bit SRR (Substitute Remote Request)  (J) (FIXED)
+// header model (32 bits)
+// HIJG FEEE DDDD CCCC BBBB BBBB AAAA AAAA
+long unsigned int _buildHeader(uint8_t messageId, uint8_t totalPartCount, uint8_t currentPartNumber,uint8_t toAddress,uint8_t fromAddress){
+    long unsigned int header=0x80; // set H=1 (FIXED), I=0 (FIXED), J=0 (FIXED), G=0 (To be implemented), F=0 (To be implemented)
+    header+=(messageId & 0x07); //set messageId
+    header=header << 4;
+    header+=(totalPartCount & 0x0F);//set total part count
+    header=header << 4;
+    header+=(currentPartNumber & 0x0F);//set current part number
+    header=header << 8;
+    header+=toAddress;//set destination address
+    header=header << 8;
+    header+=fromAddress;//set source address
+    CAN_DEBUG(PSTR("CAN:SND:CANH=%" PRIu32 ",ID=%" PRIu8 ",TOTAL=%"PRIu8",CURR=%"PRIu8",TO=%"PRIu8",FROM=%"PRIu8"\n"), header, messageId, totalPartCount,currentPartNumber,toAddress,fromAddress);
+    return header;
+}
 bool transportSend(const uint8_t to, const void* data, const uint8_t len, const bool noACK)
 {
     (void)noACK;	// some ack is provided by CAN itself. TODO implement application layer ack.
@@ -140,50 +156,32 @@ bool transportSend(const uint8_t to, const void* data, const uint8_t len, const 
     if (len % 8 != 0) {
         noOfFrames++;
     }
-//set left most bit to 1 as this indicates extended frame
-    uint8_t h1 = 0x80;
-    //increment msg_id for new message.
-    h1+=message_id;
+    //update message_id
     message_id++;
-    message_id=(message_id & 0x07);
+    //make sure message_id isn't longer than 3 bits.
+    message_id = message_id & 0x07;
 
-    //set total number of frames
-    uint8_t h2 = noOfFrames;
-    //shift left to create space for current frame number
-    h2=h2 << 4;
-    uint8_t i = 0;
     CAN_DEBUG(PSTR("CAN:SND:LN=%" PRIu8 ",NOF=%" PRIu8 "\n"), len, noOfFrames);
-
-    for (i = 0; i < noOfFrames; i++) {
-        uint32_t canId = h1;
-        canId=canId << 8;
-        //reset current frame number
-        h2 = h2 & 0xF0;
-        h2 += i;
-        canId += h2;
-        canId=canId << 8;
-        canId += to;
-        canId=canId << 8;
-        canId += _nodeId;
+    uint8_t currentFrame;
+    for (currentFrame = 0; currentFrame < noOfFrames; currentFrame++) {
         uint8_t partLen;
         if (len<=8){
             partLen=len;
-        } else if (i * 8 <= len) {
+        } else if (currentFrame * 8 <= len) {
             partLen = 8;
         } else {
             partLen = len % 8;
         }
         uint8_t buff[8];
         uint8_t j=0;
-//        memcpy(buff,datap[i*8+j],partlen);
+//        memcpy(buff,datap[currentFrame*8],partLen);
         for (j = 0; j < partLen; j++) {
-            buff[j]=datap[i*8+j];
+            buff[j]=datap[currentFrame*8+j];
         }
+
         CAN_DEBUG(PSTR("CAN:SND:LN=%" PRIu8 ",DTA0=%" PRIu8 ",DTA1=%" PRIu8 ",DTA2=%" PRIu8 ",DTA3=%" PRIu8 ",DTA4=%" PRIu8 ",DTA5=%" PRIu8 ",DTA6=%" PRIu8 ",DTA7=%" PRIu8 "\n"), partLen, buff[0], buff[1], buff[2],buff[3],buff[4],buff[5],buff[6],buff[7]);
 
-        CAN_DEBUG(PSTR("CAN:SND:LN=%" PRIu8 ",CANH=%" PRIu32 "\n"), partLen, canId);
-
-        byte sndStat = CAN0.sendMsgBuf(canId, partLen, buff);
+        byte sndStat = CAN0.sendMsgBuf(_buildHeader(message_id, noOfFrames, currentFrame, to, _nodeId), partLen, buff);
         if (sndStat == CAN_OK) {
             CAN_DEBUG(PSTR("CAN:SND:OK\n"));
             return true;
@@ -203,7 +201,7 @@ bool transportDataAvailable(void)
         long unsigned int currentPart=(rxId & 0x000F0000)>>16;
         long unsigned int totalPartCount=(rxId & 0x00F00000)>>20;
         long unsigned int messageId=(rxId & 0x07000000)>>24;
-        CAN_DEBUG(PSTR("CAN:RCV:CANH=%" PRIu32 ",FROM=%" PRIu32 ",TO=%" PRIu32 ",CURR=%" PRIu32 ",TOTAL=%" PRIu32 ",ID=%" PRIu32 "\n"), rxId, from, to, currentPart,totalPartCount,messageId);
+        CAN_DEBUG(PSTR("CAN:RCV:CANH=%" PRIu32 ",ID=%" PRIu32 ",TOTAL=%"PRIu32",CURR=%"PRIu32",TO=%"PRIu32",FROM=%"PRIu32"\n"), rxId, messageId, totalPartCount,currentPart,to,from);
 
         uint8_t slot;
         if(currentPart==0){
