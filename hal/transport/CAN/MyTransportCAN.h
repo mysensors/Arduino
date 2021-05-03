@@ -1,12 +1,12 @@
 bool _initFilters();
-
 bool transportInit(void);
 
 void _cleanSlot(uint8_t slot);
 
 uint8_t _findCanPacketSlot();
 
-uint8_t _findCanPacketSlot(long unsigned int from,long unsigned int currentPart,long unsigned int messageId);
+uint8_t _findCanPacketSlot(long unsigned int from, long unsigned int currentPart,
+                           long unsigned int messageId);
 
 bool transportSend(const uint8_t to, const void* data, const uint8_t len, const bool noACK);
 
