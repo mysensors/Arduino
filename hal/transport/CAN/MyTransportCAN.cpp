@@ -112,7 +112,8 @@ uint8_t _findCanPacketSlot() {
         }
     }
     _cleanSlot(slot);
-    //log error (message dropped)
+    CAN_DEBUG(PSTR("!CAN:RCV:SLOT=%" PRIu8 " message dropped\n"), slot);
+
     return slot;
 }
 
@@ -126,7 +127,7 @@ uint8_t _findCanPacketSlot(long unsigned int from,long unsigned int currentPart,
         }
     }
     if (slot == CAN_BUF_SIZE) {
-        //log error. Received message id not found in buffer.
+        CAN_DEBUG(PSTR("!CAN:RCV:proper slot not found\n"));
     }
     return slot;
 }
