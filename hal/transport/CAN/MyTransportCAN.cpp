@@ -11,8 +11,16 @@
 #include "hal/transport/CAN/driver/mcp_can.h"
 #include "hal/transport/CAN/driver/mcp_can.cpp"
 #include "MyTransportCAN.h"
-#define CAN0_INT 2    // TODO make configurable
-MCP_CAN CAN0(10);     // TODO make configurable
+#if defined(MY_DEBUG_VERBOSE_CAN)
+#define CAN_DEBUG(x,...)	DEBUG_OUTPUT(x, ##__VA_ARGS__)	//!< Debug print
+#else
+#define CAN_DEBUG(x,...)	//!< DEBUG null
+#endif
+#define CAN_INT 2    // TODO make configurable
+#define CAN_CS 10
+#define CAN_SPEED CAN_250KBPS
+#define CAN_CLOCK MCP_8MHZ
+MCP_CAN CAN0(CAN_CS);     // TODO make configurable
 //since long messages can be sliced and arrive mixed with other messages assemble buffer is required
 #define bufSize 8  //TODO make configurable
 bool canInitialized=false;
@@ -54,11 +62,13 @@ void _initFilters() {
     CAN0.init_Filt(4,1,0xFFFFFFFF);                // Init fifth filter.
     CAN0.init_Filt(5,1,0xFFFFFFFF);                // Init sixth filter.
     CAN0.setMode(MCP_NORMAL);
-    hwPinMode(CAN0_INT, INPUT);
+    hwPinMode(CAN_INT, INPUT);
 }
 bool transportInit(void)
 {
-    if(CAN0.begin(MCP_STDEXT, CAN_250KBPS, MCP_8MHZ) != CAN_OK) {
+    CAN_DEBUG(PSTR("CAN:INIT:CS=%" PRIu8 ",INT=%" PRIu8 ",SPE=%" PRIu8 ",CLO=%" PRIu8 "\n"), CAN_CS, CAN_INT, CAN_SPEED, CAN_CLOCK);
+
+    if(CAN0.begin(MCP_STDEXT, CAN_SPEED, CAN_CLOCK) != CAN_OK) {
         canInitialized=false;
         return false;
     }
@@ -147,6 +157,7 @@ bool transportSend(const uint8_t to, const void* data, const uint8_t len, const 
     //shift left to create space for current frame number
     h2=h2 << 4;
     uint8_t i = 0;
+    CAN_DEBUG(PSTR("CAN:SND:LN=%" PRIu8 ",NOF=%" PRIu8 "\n"), len, noOfFrames);
 
     for (i = 0; i < noOfFrames; i++) {
         uint32_t canId = h1;
@@ -170,56 +181,35 @@ bool transportSend(const uint8_t to, const void* data, const uint8_t len, const 
         uint8_t buff[8];
         uint8_t j=0;
 //        memcpy(buff,datap[i*8+j],partlen);
-Serial.print("send partLen: ");
-Serial.println(partLen);
-Serial.print("send data: ");
         for (j = 0; j < partLen; j++) {
             buff[j]=datap[i*8+j];
-            Serial.print(buff[j]);
-            Serial.print(";");
         }
+        CAN_DEBUG(PSTR("CAN:SND:LN=%" PRIu8 ",DTA0=%" PRIu8 ",DTA1=%" PRIu8 ",DTA2=%" PRIu8 ",DTA3=%" PRIu8 ",DTA4=%" PRIu8 ",DTA5=%" PRIu8 ",DTA6=%" PRIu8 ",DTA7=%" PRIu8 "\n"), partLen, buff[0], buff[1], buff[2],buff[3],buff[4],buff[5],buff[6],buff[7]);
 
+        CAN_DEBUG(PSTR("CAN:SND:LN=%" PRIu8 ",CANH=%" PRIu32 "\n"), partLen, canId);
 
-        Serial.println(".");
-
-        Serial.print("send CAN len: ");
-        Serial.println(len);
-        Serial.print("send CAN noOfFrames: ");
-        Serial.println(noOfFrames);
-        Serial.print("send CAN id: ");
-        Serial.println(canId);
         byte sndStat = CAN0.sendMsgBuf(canId, partLen, buff);
         if (sndStat == CAN_OK) {
-            Serial.print("send packet sent\n");
+            CAN_DEBUG(PSTR("CAN:SND:OK\n"));
             return true;
         } else {
-            Serial.print("send packet send error\n");
+            CAN_DEBUG(PSTR("!CAN:SND:FAIL\n"));
             return false;
         }
     }
 }
 bool transportDataAvailable(void)
 {
-    if(!hwDigitalRead(CAN0_INT))                         // If CAN0_INT pin is low, read receive buffer
+    if(!hwDigitalRead(CAN_INT))                         // If CAN_INT pin is low, read receive buffer
     {
         CAN0.readMsgBuf(&rxId, &len, rxBuf);      // Read data: len = data length, buf = data byte(s)
-        Serial.print("READ CAN id: ");
-        Serial.println(rxId);
         long unsigned int from=(rxId & 0x000000FF);
-        Serial.print("READ CAN from: ");
-        Serial.println(from);
         long unsigned int to=(rxId & 0x0000FF00)>>8;
-        Serial.print("READ CAN to: ");
-        Serial.println(to);
         long unsigned int currentPart=(rxId & 0x000F0000)>>16;
-        Serial.print("READ CAN currentPart: ");
-        Serial.println(currentPart);
         long unsigned int totalPartCount=(rxId & 0x00F00000)>>20;
-        Serial.print("READ CAN totalPartCount: ");
-        Serial.println(totalPartCount);
         long unsigned int messageId=(rxId & 0x07000000)>>24;
-        Serial.print("READ CAN messageId: ");
-        Serial.println(messageId);
+        CAN_DEBUG(PSTR("CAN:RCV:CANH=%" PRIu32 ",FROM=%" PRIu8 ",TO=%" PRIu8 ",CURR=%" PRIu8 ",TOTAL=%" PRIu8 ",ID=%" PRIu8 "\n"), rxId, from, to, currentPart,totalPartCount,messageId);
+
         uint8_t slot;
         if(currentPart==0){
             slot=_findCanPacketSlot();
@@ -231,28 +221,19 @@ bool transportDataAvailable(void)
             memcpy(packets[slot].data + packets[slot].len, rxBuf, len);
             packets[slot].lastReceivedPart++;
             packets[slot].len += len;
-            Serial.println("READ CAN data: ");
-            for(uint8_t k=0;k<packets[slot].len;k++){
-                Serial.print(packets[slot].data[k]);
-                Serial.print(", ");
-            }
-            Serial.println("");
-            Serial.print("READ CAN SLOT: ");
-            Serial.println(slot);
-            Serial.print("READ CAN lastReceivedPart: ");
-            Serial.println(packets[slot].lastReceivedPart);
+            CAN_DEBUG(PSTR("CAN:RCV:SLOT=%" PRIu8 ",PART=%" PRIu8 "\n"), slot, packets[slot].lastReceivedPart);
             if (packets[slot].lastReceivedPart == totalPartCount) {
                 packets[slot].ready = true;
-                Serial.print("READ CAN packet received\n");
+                CAN_DEBUG(PSTR("CAN:RCV:SLOT=%" PRIu8 " complete\n"), slot);
                 return true;
             }
+
         }
     }
     return false;
 }
 uint8_t transportReceive(void* data)
 {
-    Serial.print("transport receive called\n");
     uint8_t slot=bufSize;
     uint8_t i;
     for (i = 0; i < bufSize; i++) {
@@ -262,12 +243,6 @@ uint8_t transportReceive(void* data)
     }
     if (slot<bufSize) {
         memcpy(data,packets[slot].data,packets[slot].len);
-        Serial.print("transport receive data: ");
-        for(uint8_t k=0;k<packets[slot].len;k++){
-            Serial.print(packets[slot].data[k]);
-            Serial.print(", ");
-        }
-        Serial.println("");
         i=packets[slot].len;
         _cleanSlot(slot);
         return i;
