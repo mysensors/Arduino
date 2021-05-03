@@ -26,9 +26,8 @@ bool canInitialized=false;
 long unsigned int rxId;
 unsigned char len = 0;
 unsigned char rxBuf[8];
-
-
 unsigned char _nodeId;
+uint8_t message_id =0;
 
 //buffer element
 typedef struct {
@@ -143,14 +142,10 @@ bool transportSend(const uint8_t to, const void* data, const uint8_t len, const 
     }
 //set left most bit to 1 as this indicates extended frame
     uint8_t h1 = 0x80;
-    //TODO increment msg_id for new message.
-                //    uint8_t msg_id = 7;
-                //add msg_id. 7 is maximum allowed value (3bits)
-                //    h1 += (msg_id & 0x07);
-                //    if (!noACK) {
-                        //set require ACK bit - to be implemented
-                //        h1 = h1 | 0x08;
-                //    }
+    //increment msg_id for new message.
+    h1+=message_id;
+    message_id++;
+    message_id=(message_id & 0x07);
 
     //set total number of frames
     uint8_t h2 = noOfFrames;
@@ -208,7 +203,7 @@ bool transportDataAvailable(void)
         long unsigned int currentPart=(rxId & 0x000F0000)>>16;
         long unsigned int totalPartCount=(rxId & 0x00F00000)>>20;
         long unsigned int messageId=(rxId & 0x07000000)>>24;
-        CAN_DEBUG(PSTR("CAN:RCV:CANH=%" PRIu32 ",FROM=%" PRIu8 ",TO=%" PRIu8 ",CURR=%" PRIu8 ",TOTAL=%" PRIu8 ",ID=%" PRIu8 "\n"), rxId, from, to, currentPart,totalPartCount,messageId);
+        CAN_DEBUG(PSTR("CAN:RCV:CANH=%" PRIu32 ",FROM=%" PRIu32 ",TO=%" PRIu32 ",CURR=%" PRIu32 ",TOTAL=%" PRIu32 ",ID=%" PRIu32 "\n"), rxId, from, to, currentPart,totalPartCount,messageId);
 
         uint8_t slot;
         if(currentPart==0){
