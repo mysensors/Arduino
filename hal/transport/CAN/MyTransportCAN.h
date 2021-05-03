@@ -1,4 +1,4 @@
-void _initFilters();
+bool _initFilters();
 
 bool transportInit(void);
 

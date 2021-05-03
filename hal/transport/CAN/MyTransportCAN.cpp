@@ -45,21 +45,25 @@ typedef struct {
 CAN_Packet packets[CAN_BUF_SIZE];
 
 //filter incoming messages (MCP2515 feature)
-void _initFilters() {
-    if (!canInitialized)
-        return;
-    CAN0.setMode(MODE_CONFIG);
-    CAN0.init_Mask(0,1,0x0000FF00);                // Init first mask. Only destination address will be used to filter messages
-    CAN0.init_Filt(0,1,BROADCAST_ADDRESS<<8);      // Init first filter. Accept broadcast messages.
-    CAN0.init_Filt(1,1,_nodeId<<8);                // Init second filter. Accept messages send to this node.
+bool _initFilters() {
+    if (!canInitialized) {
+        return false;
+    }
+    uint8_t err=0;
+    err+=CAN0.setMode(MODE_CONFIG);
+
+    err+=CAN0.init_Mask(0,1,0x0000FF00);                // Init first mask. Only destination address will be used to filter messages
+    err+=CAN0.init_Filt(0,1,BROADCAST_ADDRESS<<8);      // Init first filter. Accept broadcast messages.
+    err+=CAN0.init_Filt(1,1,_nodeId<<8);                // Init second filter. Accept messages send to this node.
 //second mask and filters need to be set. Otherwise all messages would be accepted.
-    CAN0.init_Mask(1,1,0xFFFFFFFF);                // Init second mask.
-    CAN0.init_Filt(2,1,0xFFFFFFFF);                // Init third filter.
-    CAN0.init_Filt(3,1,0xFFFFFFFF);                // Init fourth filter.
-    CAN0.init_Filt(4,1,0xFFFFFFFF);                // Init fifth filter.
-    CAN0.init_Filt(5,1,0xFFFFFFFF);                // Init sixth filter.
-    CAN0.setMode(MCP_NORMAL);
+    err+=CAN0.init_Mask(1,1,0xFFFFFFFF);                // Init second mask.
+    err+=CAN0.init_Filt(2,1,0xFFFFFFFF);                // Init third filter.
+    err+=CAN0.init_Filt(3,1,0xFFFFFFFF);                // Init fourth filter.
+    err+=CAN0.init_Filt(4,1,0xFFFFFFFF);                // Init fifth filter.
+    err+=CAN0.init_Filt(5,1,0xFFFFFFFF);                // Init sixth filter.
+    err+=CAN0.setMode(MCP_NORMAL);
     hwPinMode(CAN_INT, INPUT);
+    return err <= 0;
 }
 bool transportInit(void)
 {
@@ -73,9 +77,7 @@ bool transportInit(void)
     for (uint8_t i = 0; i < CAN_BUF_SIZE; i++) {
         _cleanSlot(i);
     }
-    _initFilters();
-    return true;
-
+    return _initFilters();
 }
 
 //clear single slot in buffer.
