@@ -1,12 +1,15 @@
-// from 8bits (A)
-// to 8bits (B)
-// current part 4 bits (C)
-// total part count 4bits (D)
+// from address 8bits (A)
+// to address 8 bits (B)
+// current part number 4 bits (C)
+// total part count 4 bits (D)
 // 3 bits message_id (E)
 // 1 bit require ack (F)
 // 1 bit is ack (G)
-// header model (29 bits)
-// G FEEE DDDD CCCC BBBB BBBB AAAA AAAA
+// 1 bit is extended frame (H). (FIXED)
+// 1 bit RTR (Remote Transmission Request) (I) (FIXED)
+// 1 bit SRR (Substitute Remote Request)  (J) (FIXED)
+// header model (32 bits)
+// HIJG FEEE DDDD CCCC BBBB BBBB AAAA AAAA
 
 #include "hal/transport/CAN/driver/mcp_can.h"
 #include "hal/transport/CAN/driver/mcp_can.cpp"
