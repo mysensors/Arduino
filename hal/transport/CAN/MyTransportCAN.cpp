@@ -22,7 +22,7 @@
 #define CAN_CLOCK MCP_8MHZ
 MCP_CAN CAN0(CAN_CS);     // TODO make configurable
 //since long messages can be sliced and arrive mixed with other messages assemble buffer is required
-#define bufSize 8  //TODO make configurable
+#define CAN_BUF_SIZE 8  //TODO make configurable
 bool canInitialized=false;
 
 //input buffer for raw data (from library).
@@ -36,7 +36,7 @@ unsigned char _nodeId;
 //buffer element
 typedef struct {
     uint8_t len;
-    uint8_t data[32];
+    uint8_t data[MAX_MESSAGE_SIZE];
     uint8_t address;
     uint8_t lastReceivedPart;
     bool locked;
@@ -45,7 +45,7 @@ typedef struct {
     bool ready;
 } CAN_Packet;
 
-CAN_Packet packets[bufSize];
+CAN_Packet packets[CAN_BUF_SIZE];
 
 //filter incoming messages (MCP2515 feature)
 void _initFilters() {
@@ -73,7 +73,7 @@ bool transportInit(void)
         return false;
     }
     canInitialized=true;
-    for (uint8_t i = 0; i < bufSize; i++) {
+    for (uint8_t i = 0; i < CAN_BUF_SIZE; i++) {
         _cleanSlot(i);
     }
     _initFilters();
@@ -94,20 +94,20 @@ void _cleanSlot(uint8_t slot) {
 
 //find empty slot in buffer
 uint8_t _findCanPacketSlot() {
-    uint8_t slot=bufSize;
+    uint8_t slot=CAN_BUF_SIZE;
     uint8_t i;
-    for (i = 0; i < bufSize; i++) {
+    for (i = 0; i < CAN_BUF_SIZE; i++) {
         if(packets[i].locked) {
             packets[i].age++;
         } else {
             slot=i;
         }
     }
-    if(slot<bufSize)
+    if(slot < CAN_BUF_SIZE)
         return slot;
     //if empty slot not found. Clear oldest message.
     slot=0;
-    for (i = 1; i < bufSize; i++) {
+    for (i = 1; i < CAN_BUF_SIZE; i++) {
         if(packets[i].age>packets[slot].age) {
             slot=i;
         }
@@ -119,14 +119,14 @@ uint8_t _findCanPacketSlot() {
 
 //find slot with previous data parts.
 uint8_t _findCanPacketSlot(long unsigned int from,long unsigned int currentPart,long unsigned int messageId){
-    uint8_t slot=bufSize;
+    uint8_t slot=CAN_BUF_SIZE;
     uint8_t i;
-    for (i = 0; i < bufSize; i++) {
+    for (i = 0; i < CAN_BUF_SIZE; i++) {
         if(packets[i].locked && packets[i].address==from && packets[i].packetId==messageId && packets[i].lastReceivedPart==currentPart+1) {
             slot=i;
         }
     }
-    if (slot==bufSize) {
+    if (slot == CAN_BUF_SIZE) {
         //log error. Received message id not found in buffer.
     }
     return slot;
@@ -217,7 +217,7 @@ bool transportDataAvailable(void)
         } else {
             slot=_findCanPacketSlot(from,currentPart,messageId);
         }
-        if (slot!=bufSize) {
+        if (slot != CAN_BUF_SIZE) {
             memcpy(packets[slot].data + packets[slot].len, rxBuf, len);
             packets[slot].lastReceivedPart++;
             packets[slot].len += len;
@@ -234,14 +234,14 @@ bool transportDataAvailable(void)
 }
 uint8_t transportReceive(void* data)
 {
-    uint8_t slot=bufSize;
+    uint8_t slot=CAN_BUF_SIZE;
     uint8_t i;
-    for (i = 0; i < bufSize; i++) {
+    for (i = 0; i < CAN_BUF_SIZE; i++) {
         if(packets[i].ready) {
             slot=i;
         }
     }
-    if (slot<bufSize) {
+    if (slot < CAN_BUF_SIZE) {
         memcpy(data,packets[slot].data,packets[slot].len);
         i=packets[slot].len;
         _cleanSlot(slot);
