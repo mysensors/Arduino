@@ -6,7 +6,7 @@ def call(config) {
 				Documentation/doxygen.sh"""
 	warnings canComputeNew: false, canResolveRelativePaths: false,
 		defaultEncoding: '',
-		excludePattern: '''.*/hal/architecture/Linux/drivers/.*,.*/hal/transport/PJON/driver/.*,.*/hal/architecture/AVR/drivers/.*,.*/drivers/TinyGSM/.*''',
+		excludePattern: '''.*/hal/architecture/Linux/drivers/.*,.*/hal/transport/PJON/driver/.*,.*/hal/transport/CAN/driver/.*,.*/hal/architecture/AVR/drivers/.*,.*/drivers/TinyGSM/.*''',
 		failedTotalAll: '', healthy: '', includePattern: '', messagesPattern: '',
 		parserConfigurations: [[parserName: 'Doxygen', pattern: config.repository_root+'doxygen.log']],
 		unHealthy: '', unstableTotalAll: '0'
