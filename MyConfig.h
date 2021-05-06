@@ -272,7 +272,6 @@
  * @brief Define this to use the CAN wired transport for sensor network communication.
  */
 //#define MY_CAN
-#if defined(MY_CAN)
 /**
  * @def MY_DEBUG_VERBOSE_CAN
  * @brief Define this for verbose debug prints related to the %CAN driver.
@@ -312,7 +311,6 @@
  */
 #ifndef CAN_BUF_SIZE
 #define CAN_BUF_SIZE (8u)
-#endif
 #endif
 
 /**
