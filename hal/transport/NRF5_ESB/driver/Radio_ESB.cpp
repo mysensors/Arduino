@@ -552,7 +552,7 @@ static inline uint8_t NRF5_ESB_byte_time()
 	} else if (MY_NRF5_ESB_MODE == NRF5_2MBPS) {
 		return (2);
 	}
-#ifdef NRF5_250KBPS
+#ifdef RADIO_MODE_MODE_Nrf_250Kbit
 	else if (MY_NRF5_ESB_MODE == NRF5_250KBPS) {
 		return (5);
 	}
