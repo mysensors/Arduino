@@ -90,6 +90,8 @@
 #define DEFAULT_RFM69_IRQ_PIN			(2)												//!< DEFAULT_RFM69_IRQ_PIN
 #elif defined(LINUX_ARCH_RASPBERRYPI)
 #define DEFAULT_RFM69_IRQ_PIN			(22)											//!< DEFAULT_RFM69_IRQ_PIN
+#elif defined(ARDUINO_ARCH_STM32)
+#define DEFAULT_RFM69_IRQ_PIN			(PA3)											//!< DEFAULT_RFM69_IRQ_PIN
 #elif defined(ARDUINO_ARCH_STM32F1)
 #define DEFAULT_RFM69_IRQ_PIN			(PA3)											//!< DEFAULT_RFM69_IRQ_PIN
 #elif defined(TEENSYDUINO)
