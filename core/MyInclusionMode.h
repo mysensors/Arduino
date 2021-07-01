@@ -29,5 +29,9 @@ void inclusionInit();
 void inclusionModeSet(bool newMode);
 void inclusionProcess();
 
+/**
+ * Allow user to define their own inclusion mode indication handler.
+ */
+void inclusionModeIndication(bool mode);
 
 #endif

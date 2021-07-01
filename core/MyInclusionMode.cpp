@@ -35,11 +35,9 @@ inline void inclusionInit()
 #if defined (MY_INCLUSION_LED_PIN)
 	// Setup LED pin that indicates inclusion mode
 	hwPinMode(MY_INCLUSION_LED_PIN, OUTPUT);
-	hwDigitalWrite(MY_INCLUSION_LED_PIN, LED_OFF);
 #endif
-
+	inclusionModeSet(_inclusionMode);
 }
-
 
 void inclusionModeSet(bool newMode)
 {
@@ -54,6 +52,7 @@ void inclusionModeSet(bool newMode)
 #if defined (MY_INCLUSION_LED_PIN)
 	hwDigitalWrite(MY_INCLUSION_LED_PIN, _inclusionMode ? LED_ON : LED_OFF);
 #endif
+	inclusionModeIndication(_inclusionMode);
 }
 
 inline void inclusionProcess()
@@ -70,3 +69,11 @@ inline void inclusionProcess()
 		inclusionModeSet(false);
 	}
 }
+
+#if !defined(MY_INCLUSION_INDICATION_HANDLER)
+void inclusionModeIndication(bool newMode)
+{
+	// empty function, resolves AVR-specific GCC optimization bug (<5.5) if handler not used
+	// see here: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=77326
+}
+#endif

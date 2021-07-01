@@ -1416,6 +1416,13 @@
 #define MY_INCLUSION_BUTTON_PRESSED (LOW)
 #endif
 
+/**
+ * @def MY_INCLUSION_INDICATION_HANDLER
+ * @brief Define to use own inclusion mode indication handler.
+ */
+//#define MY_INCLUSION_INDICATION_HANDLER
+
+
 /**************************************
 * Ethernet Gateway Transport Defaults
 ***************************************/
@@ -2390,6 +2397,7 @@
 #define MY_DEBUG_VERBOSE_GATEWAY
 #define MY_INCLUSION_BUTTON_EXTERNAL_PULLUP
 #define MY_INCLUSION_LED_PIN
+#define MY_INCLUSION_INDICATION_HANDLER
 #define MY_GATEWAY_W5100
 #define MY_GATEWAY_ENC28J60
 #define MY_GATEWAY_ESP8266
