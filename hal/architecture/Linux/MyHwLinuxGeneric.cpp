@@ -38,6 +38,8 @@ bool hwInit(void)
 		exit(1);
 	}
 
+	logInfo("Using eeprom file %s\n", conf.eeprom_file);
+
 	return true;
 }
 

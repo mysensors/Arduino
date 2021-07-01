@@ -25,7 +25,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <sys/file.h>
 #include "log.h"
+#include <errno.h>
 
 static int _config_create(const char *config_file);
 static int _config_parse_int(char *token, const char *name, int *value);
@@ -38,6 +40,7 @@ int config_parse(const char *config_file)
 	FILE *fptr;
 	char buf[1024];
 	struct stat fileInfo;
+	logInfo("Using config file %s\n", config_file);
 
 	if (stat(config_file, &fileInfo) != 0) {
 		//File does not exist.  Create it.
@@ -47,7 +50,7 @@ int config_parse(const char *config_file)
 
 	fptr = fopen(config_file, "rt");
 	if (!fptr) {
-		logError("Error opening config file \"%s\".\n", config_file);
+		logError("Error opening config file \"%s\": %s\n", config_file, strerror(errno));
 		return -1;
 	}
 
@@ -262,7 +265,7 @@ int _config_create(const char *config_file)
 
 	myFile = fopen(config_file, "w");
 	if (!myFile) {
-		logError("Unable to create config file %s.\n", config_file);
+		logError("Unable to create config file %s: %s\n", config_file, strerror(errno));
 		return -1;
 	}
 	ret = fputs(default_conf, myFile);

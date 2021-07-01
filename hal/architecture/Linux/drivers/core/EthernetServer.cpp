@@ -90,7 +90,7 @@ void EthernetServer::begin(IPAddress address)
 	}
 
 	if (p == NULL)  {
-		logError("Failed to bind!\n");
+		logError("Failed to bind to port %d! Is another instance running?\n", port);
 		freeaddrinfo(servinfo);
 		return;
 	}

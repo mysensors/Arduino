@@ -4,7 +4,7 @@
 # Original work: https://github.com/TMRh20/RF24/blob/master/configure
 
 function help {
-cat <<EOF	
+cat <<EOF
 configure script for MySensors gateway.
 Options:
 
@@ -34,6 +34,7 @@ Building options:
 Installation options:
     --prefix=<PREFIX>           Installation prefix path. [/usr/local]
     --gateway-dir=<DIR>         Gateway files installation directory. [PREFIX/bin]
+    --service-name=<NAME>       Name for the binary and systemd service. [mysgw]
 
 MySensors options:
     --my-debug=[enable|disable] Enables or disables MySensors core debugging. [enable]
@@ -297,7 +298,7 @@ signing=none
 signing_request_signatures=false
 encryption=false
 
-params="SOC CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PREFIX CC CXX ARDUINO_LIB_DIR BUILDDIR BINDIR GATEWAY_DIR INIT_SYSTEM SPI_DRIVER"
+params="SOC CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PREFIX CC CXX ARDUINO_LIB_DIR BUILDDIR BINDIR GATEWAY_DIR INIT_SYSTEM SPI_DRIVER SERVICE_NAME"
 
 for opt do
     if [ "$opt" = "-h" ] || [ "$opt" = "--help" ]; then
@@ -344,6 +345,10 @@ for opt do
         ;;
     --bin-dir=*)
         BINDIR="$optarg"
+        ;;
+    --service-name=*)
+        SERVICE_NAME="$optarg"
+        CPPFLAGS="-DSERVICENAME=\"${optarg}\" $CPPFLAGS"
         ;;
     --no-clean*)
         NO_CLEAN="1"
@@ -547,6 +552,7 @@ PREFIX=${PREFIX:-/usr/local}
 BUILDDIR=${BUILDDIR:-build}
 BINDIR=${BINDIR:-bin}
 GATEWAY_DIR=${GATEWAY_DIR:-${PREFIX}/bin}
+SERVICE_NAME=${SERVICE_NAME:-mysgw}
 CC=${CC:-gcc}
 CXX=${CXX:-g++}
 CXXFLAGS="$CXXFLAGS -std=c++11"

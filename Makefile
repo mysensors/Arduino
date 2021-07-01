@@ -18,7 +18,7 @@ include $(CONFIG_FILE)
 CPPFLAGS+=-Ofast -g -Wall -Wextra
 DEPFLAGS=-MT $@ -MMD -MP
 
-GATEWAY_BIN=mysgw
+GATEWAY_BIN=$(SERVICE_NAME)
 GATEWAY=$(BINDIR)/$(GATEWAY_BIN)
 GATEWAY_C_SOURCES=$(wildcard hal/architecture/Linux/drivers/core/*.c)
 GATEWAY_CPP_SOURCES=$(wildcard hal/architecture/Linux/drivers/core/*.cpp) examples_linux/mysgw.cpp
@@ -124,31 +124,33 @@ install-gateway:
 
 install-initscripts:
 ifeq ($(INIT_SYSTEM), systemd)
-	install -m0644 initscripts/mysgw.systemd ${DESTDIR}/etc/systemd/system/mysgw.service
-	@sed -i -e "s|%gateway_dir%|${GATEWAY_DIR}|g" ${DESTDIR}/etc/systemd/system/mysgw.service
+	install -m0644 initscripts/mysgw.systemd ${DESTDIR}/etc/systemd/system/${SERVICE_NAME}.service
+	@sed -i -e "s|%gateway_dir%|${GATEWAY_DIR}|g" ${DESTDIR}/etc/systemd/system/${SERVICE_NAME}.service
+	@sed -i -e "s|%mysgw%|${SERVICE_NAME}|g" ${DESTDIR}/etc/systemd/system/${SERVICE_NAME}.service
 	systemctl daemon-reload
 	@echo "MySensors gateway has been installed, to add to the boot run:"
-	@echo "  sudo systemctl enable mysgw.service"
+	@echo "  sudo systemctl enable ${SERVICE_NAME}.service"
 	@echo "To start the gateway run:"
-	@echo "  sudo systemctl start mysgw.service"
+	@echo "  sudo systemctl start ${SERVICE_NAME}.service"
 else ifeq ($(INIT_SYSTEM), sysvinit)
-	install -m0755 initscripts/mysgw.sysvinit ${DESTDIR}/etc/init.d/mysgw
-	@sed -i -e "s|%gateway_dir%|${GATEWAY_DIR}|g" ${DESTDIR}/etc/init.d/mysgw
+	install -m0755 initscripts/mysgw.sysvinit ${DESTDIR}/etc/init.d/${SERVICE_NAME}
+	@sed -i -e "s|%gateway_dir%|${GATEWAY_DIR}|g" ${DESTDIR}/etc/init.d/${SERVICE_NAME}
+	@sed -i -e "s|%mysgw%|${SERVICE_NAME}|g" ${DESTDIR}/etc/init.d/${SERVICE_NAME}
 	@echo "MySensors gateway has been installed, to add to the boot run:"
-	@echo "  sudo update-rc.d mysgw defaults"
+	@echo "  sudo update-rc.d ${SERVICE_NAME} defaults"
 	@echo "To start the gateway run:"
-	@echo "  sudo service mysgw start"
+	@echo "  sudo service ${SERVICE_NAME} start"
 endif
 
 uninstall:
 ifeq ($(INIT_SYSTEM), systemd)
-	@echo "Stopping daemon mysgw (ignore errors)"
-	-@systemctl stop mysgw.service
+	@echo "Stopping daemon ${SERVICE_NAME} (ignore errors)"
+	-@systemctl stop ${SERVICE_NAME}.service
 	@echo "removing files"
-	rm /etc/systemd/system/mysgw.service $(GATEWAY_DIR)/$(GATEWAY_BIN)
+	rm /etc/systemd/system/${SERVICE_NAME}.service $(GATEWAY_DIR)/$(GATEWAY_BIN)
 else ifeq ($(INIT_SYSTEM), sysvinit)
-	@echo "Stopping daemon mysgw (ignore errors)"
-	-@service mysgw stop
+	@echo "Stopping daemon ${SERVICE_NAME} (ignore errors)"
+	-@service ${SERVICE_NAME} stop
 	@echo "removing files"
-	rm /etc/init.d/mysgw $(GATEWAY_DIR)/$(GATEWAY_BIN)
+	rm /etc/init.d/${SERVICE_NAME} $(GATEWAY_DIR)/$(GATEWAY_BIN)
 endif

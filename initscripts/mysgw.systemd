@@ -3,7 +3,7 @@ Description=MySensors Gateway daemon
 Requires=network.target
 
 [Service]
-ExecStart=%gateway_dir%/mysgw -q
+ExecStart=%gateway_dir%/%mysgw% -q
 
 [Install]
 WantedBy=multi-user.target
