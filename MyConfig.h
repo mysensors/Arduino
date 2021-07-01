@@ -469,6 +469,16 @@
 #define MY_RF24_CHANNEL (76)
 #endif
 
+// legacy - remove for 3.0.0
+/**
+* @def RF24_DATARATE
+* @brief Define this to specify a specific wireless data rate used by the RF24
+* @deprecated This flag is deprecated and replaced by @ref MY_RF24_DATARATE
+*/
+#ifdef RF24_DATARATE
+#error RF24_DATARATE is deprecated, use MY_RF24_DATARATE instead!
+#endif
+
 /**
  * @def MY_RF24_DATARATE
  * @brief RF24 data rate.
