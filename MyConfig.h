@@ -1161,6 +1161,15 @@
 #endif
 
 /**
+ *@def MY_TRANSPORT_N2N_FEATURE_DISABLED
+ *@brief If defined, disables the direct node to node transport send attempts
+ *
+ * Use this function together with the option @ref MY_PARENT_NODE_IS_STATIC
+ * to ensure that all telegrams sent are routed exclusively through the associated parent node.
+ */
+//#define MY_TRANSPORT_N2N_FEATURE_DISABLED
+
+/**
  *@def MY_TRANSPORT_UPLINK_CHECK_DISABLED
  *@brief If defined, disables uplink check to GW during transport initialisation
  */
@@ -2362,6 +2371,7 @@
 // transport
 #define MY_PARENT_NODE_IS_STATIC
 #define MY_REGISTRATION_CONTROLLER
+#define MY_TRANSPORT_N2N_FEATURE_DISABLED
 #define MY_TRANSPORT_UPLINK_CHECK_DISABLED
 #define MY_TRANSPORT_SANITY_CHECK
 #define MY_NODE_LOCK_FEATURE

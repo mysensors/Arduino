@@ -545,6 +545,7 @@ bool transportRouteMessage(MyMessage &message)
 #endif
 		}
 #else
+#if !defined(MY_TRANSPORT_N2N_FEATURE_DISABLED)
 		if (destination > GATEWAY_ADDRESS && destination < BROADCAST_ADDRESS) {
 			// node2node traffic: assume node is in vincinity. If transmission fails, hand over to parent
 			if (transportSendWrite(destination, message)) {
@@ -553,6 +554,9 @@ bool transportRouteMessage(MyMessage &message)
 			}
 			TRANSPORT_DEBUG(PSTR("!TSF:RTE:N2N FAIL\n"));
 		}
+#else
+		TRANSPORT_DEBUG(PSTR("TSF:RTE:N2N DIS\n"));
+#endif
 		route = _transportConfig.parentNodeId;	// not a repeater, all traffic routed via parent
 #endif
 	}
