@@ -252,20 +252,29 @@ LOCAL void RF24_openWritingPipe(const uint8_t recipient)
 LOCAL void RF24_startListening(void)
 {
 	RF24_DEBUG(PSTR("RF24:STL\n"));	// start listening
+#if MY_RF24_CE_PIN == NOT_A_PIN
+	RF24_sleep();
+#endif
 	// toggle PRX
 	RF24_setRFConfiguration(RF24_CONFIGURATION | _BV(RF24_PWR_UP) | _BV(RF24_PRIM_RX) );
 	// all RX pipe addresses must be unique, therefore skip if node ID is RF24_BROADCAST_ADDRESS
 	if(RF24_NODE_ADDRESS!= RF24_BROADCAST_ADDRESS) {
 		RF24_setPipeLSB(RF24_REG_RX_ADDR_P0, RF24_NODE_ADDRESS);
 	}
+#if MY_RF24_CE_PIN != NOT_A_PIN
 	// start listening
 	RF24_ce(HIGH);
+#endif
 }
 
 LOCAL void RF24_stopListening(void)
 {
 	RF24_DEBUG(PSTR("RF24:SPL\n"));	// stop listening
+#if MY_RF24_CE_PIN == NOT_A_PIN
+	RF24_sleep();
+#else
 	RF24_ce(LOW);
+#endif
 	// timing
 	delayMicroseconds(130);
 	RF24_setRFConfiguration(RF24_CONFIGURATION | _BV(RF24_PWR_UP) );
