@@ -166,7 +166,9 @@
 #elif defined(ARDUINO_ARCH_AVR)
 #define MY_CAP_ARCH "A"
 #elif defined(ARDUINO_ARCH_STM32F1)
-#define MY_CAP_ARCH "M"
+#define MY_CAP_ARCH "F"
+#elif defined(ARDUINO_ARCH_STM32)
+#define MY_CAP_ARCH "f"
 #elif defined(__arm__) && defined(TEENSYDUINO)
 #define MY_CAP_ARCH "T"
 #elif defined(__linux__)

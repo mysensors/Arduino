@@ -78,6 +78,8 @@
 //#define DEFAULT_RF24_CS_PIN			(24)	//!< DEFAULT_RF24_CS_PIN
 #elif defined(ARDUINO_ARCH_STM32F1)
 #define DEFAULT_RF24_CE_PIN				(PB0)	//!< DEFAULT_RF24_CE_PIN
+#elif defined(ARDUINO_ARCH_STM32)
+#define DEFAULT_RF24_CE_PIN				(PB0)	//!< DEFAULT_RF24_CE_PIN
 #elif defined(TEENSYDUINO)
 #define DEFAULT_RF24_CE_PIN				(9)		//!< DEFAULT_RF24_CE_PIN
 #else

@@ -1349,6 +1349,8 @@ static void	probe_and_print_peripherals(void)
 	Serial.print(F("| SAMD         | DETECTED     | N/A          | "));
 #elif defined(ARDUINO_ARCH_STM32F1)
 	Serial.print(F("| STM32F1      | DETECTED     | N/A          | "));
+#elif defined(ARDUINO_ARCH_STM32)
+	Serial.print(F("| STM32        | DETECTED     | N/A          | "));
 #elif defined(__linux__)
 	Serial.print(F("| Linux        | DETECTED     | N/A          | "));
 #else
