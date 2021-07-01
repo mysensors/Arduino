@@ -545,15 +545,17 @@ bool transportRouteMessage(MyMessage &message)
 #endif
 		}
 #else
-		if (destination > GATEWAY_ADDRESS && destination < BROADCAST_ADDRESS) {
-			// node2node traffic: assume node is in vincinity. If transmission fails, hand over to parent
+		// not a repeater, all traffic routed via parent or N2N
+		route = _transportConfig.parentNodeId;
+		// Try node2node traffic if destination is not parent and is not a broadcast
+		if (destination != route && destination != BROADCAST_ADDRESS) {
+			// N2N: assume node is in vicinity. If transmission fails, hand over to parent
 			if (transportSendWrite(destination, message)) {
 				TRANSPORT_DEBUG(PSTR("TSF:RTE:N2N OK\n"));
 				return true;
 			}
 			TRANSPORT_DEBUG(PSTR("!TSF:RTE:N2N FAIL\n"));
 		}
-		route = _transportConfig.parentNodeId;	// not a repeater, all traffic routed via parent
 #endif
 	}
 	// send message
