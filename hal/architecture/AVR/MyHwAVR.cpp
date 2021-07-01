@@ -31,6 +31,13 @@ bool hwInit(void)
 }
 
 #define WDTO_SLEEP_FOREVER		(0xFFu)
+// Atmel has decided that the Watchdog should have a different name but zero difference
+// in functionality.
+#if defined( __AVR_ATtiny25__ ) || defined( __AVR_ATtiny45__ ) || defined( __AVR_ATtiny85__ ) || defined( __AVR_ATtiny87__ ) || defined( __AVR_ATtiny167__ )
+	#define WATCHDOG_REGISTER WDTCR
+#else
+	#define WATCHDOG_REGISTER WDTCSR
+#endif
 
 volatile uint8_t _wokeUpByInterrupt =
     INVALID_INTERRUPT_NUM;    // Interrupt number that woke the mcu.
@@ -89,11 +96,11 @@ void hwPowerDown(const uint8_t wdto)
 	// disable ADC for power saving
 	ADCSRA &= ~(1 << ADEN);
 	// save WDT settings
-	const uint8_t WDTsave = WDTCSR;
+	const uint8_t WDTsave = WATCHDOG_REGISTER;
 	if (wdto != WDTO_SLEEP_FOREVER) {
 		wdt_enable(wdto);
 		// enable WDT interrupt before system reset
-		WDTCSR |= (1 << WDCE) | (1 << WDIE);
+		WATCHDOG_REGISTER |= (1 << WDCE) | (1 << WDIE);
 	} else {
 		// if sleeping forever, disable WDT
 		wdt_disable();
@@ -114,9 +121,9 @@ void hwPowerDown(const uint8_t wdto)
 	cli();
 	wdt_reset();
 	// enable WDT changes
-	WDTCSR |= (1 << WDCE) | (1 << WDE);
+	WATCHDOG_REGISTER |= (1 << WDCE) | (1 << WDE);
 	// restore saved WDT settings
-	WDTCSR = WDTsave;
+	WATCHDOG_REGISTER = WDTsave;
 	sei();
 	// enable ADC
 	ADCSRA |= (1 << ADEN);
@@ -311,7 +318,7 @@ uint16_t hwCPUFrequency(void)
 {
 	cli();
 	// save WDT & timer settings
-	const uint8_t WDTsave = WDTCSR;
+	const uint8_t WDTsave = WATCHDOG_REGISTER;
 	const uint8_t TCCR1Asave = TCCR1A;
 	const uint8_t TCCR1Bsave = TCCR1B;
 	const uint8_t TCCR1Csave = TCCR1C;
@@ -323,18 +330,18 @@ uint16_t hwCPUFrequency(void)
 	// set wdt
 	wdt_enable(WDTO_500MS);
 	// enable WDT interrupt mode => first timeout WDIF, 2nd timeout reset
-	WDTCSR |= (1 << WDIE);
+	WATCHDOG_REGISTER |= (1 << WDIE);
 	wdt_reset();
 	// start timer1 with 1024 prescaling
 	TCCR1B = _BV(CS12) | _BV(CS10);
 	// wait until wdt interrupt
-	while (bit_is_clear(WDTCSR,WDIF)) {};
+	while (bit_is_clear(WATCHDOG_REGISTER,WDIF)) {};
 	// stop timer
 	TCCR1B = 0;
 	// restore WDT settings
 	wdt_reset();
-	WDTCSR |= (1 << WDCE) | (1 << WDE);
-	WDTCSR = WDTsave;
+	WATCHDOG_REGISTER |= (1 << WDCE) | (1 << WDE);
+	WATCHDOG_REGISTER = WDTsave;
 	sei();
 	const uint16_t result = TCNT1 * 2048UL / 100000UL;
 	// restore timer settings

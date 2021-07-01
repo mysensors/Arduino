@@ -28,7 +28,12 @@
 #include <avr/wdt.h>
 #include <avr/boot.h>
 #include <util/atomic.h>
-#include <SPI.h>
+
+#if defined( __AVR_ATtiny25__ ) || defined( __AVR_ATtiny45__ ) || defined( __AVR_ATtiny85__ ) || defined( __AVR_ATtiny87__ ) || defined( __AVR_ATtiny167__ )	
+    #include <TinySoftwareSPI.h>
+#else
+    #include <SPI.h>
+#endif
 
 // Fast IO driver
 #include "drivers/DigitalWriteFast/digitalWriteFast.h"
