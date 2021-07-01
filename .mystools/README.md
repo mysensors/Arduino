@@ -109,23 +109,23 @@ configuring your development environment.
 Note: The apt versions are too old on Trusty so follow the [Linux - Build and Install from Source](#buildFromSource) instructions
 
 ##### Windows - WSL
-Tested with Ubuntu 18-04 LTS and 19.04
+Tested with Ubuntu 18.04 LTS and 19.04
 ```
-apt-get install astyle
-git clone https://github.com/danmar/cppcheck.git
-cd cppcheck/
-git checkout 2.1 # or later version if available
-mkdir build && cd build && cmake .. && cmake --build .
-sudo make MATCHCOMPILER=yes FILESDIR=/usr/share/cppcheck HAVE_RULES=yes CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function" install
+$ apt-get install astyle
+$ git clone https://github.com/danmar/cppcheck.git
+$ cd cppcheck/
+$ git checkout 2.1 # or later version if available
+$ mkdir build && cd build && cmake .. && cmake --build .
+$ sudo make MATCHCOMPILER=yes FILESDIR=/usr/share/cppcheck HAVE_RULES=yes CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function" install
 ```
 
 ##### Windows - GitHub Git Shell
 
 ###### *IMPORTANT:  Be sure to launch PowerShell As Administrator*
 
-```
 ### Install AStyle
 
+```
 # Download
 iwr 'https://netix.dl.sourceforge.net/project/astyle/astyle/astyle%203.1/AStyle_3.1_windows.zip' -UserAgent [Microsoft.PowerShell.Commands.PSUserAgent]::FireFox -OutFile astyle.3.1.zip
 
@@ -136,44 +136,59 @@ mv .\astyle.3.1.zip\AStyle 'C:\Program Files\AStyle'
 # Add AStyle to your path
 [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files\AStyle\bin")
 [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files\AStyle\bin", [EnvironmentVariableTarget]::Machine)
+```
 
 ### Install Cppcheck x64
 
+```
 # 64-bit
 iwr 'https://github.com/danmar/cppcheck/releases/download/2.1/cppcheck-2.1-x64-Setup.msi' -UserAgent [Microsoft.PowerShell.Commands.PSUserAgent]::FireFox -OutFile cppcheck-2.1-x64-Setup.msi
 
 # Launch installer to install Cppcheck
 & .\cppcheck-2.1-x64-Setup.msi
 
-### Add Cppcheck to your path
+# Add Cppcheck to your path
 [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files\Cppcheck", [EnvironmentVariableTarget]::Machine)
+```
 
 ### At this point you need to reboot for the path changes to take effect
-```
 
 ##### Windows - Cygwin
-```
-Run Either Cygwin Setup-x86-64.exe or Setup-x86.exe depending upon your OS. Select and install astyle and cppcheck
-```
+
+Run either `Cygwin Setup-x86-64.exe` or `Setup-x86.exe` depending upon your OS. Select and install `astyle` and `cppcheck`.
 
 ##### <a name="buildFromSource"></a>Linux - Build and Install from Source
 
-```
 ### Install AStyle
 
-# Download
-curl -L 'https://sourceforge.net/projects/astyle/files/astyle/astyle%202.05.1/astyle_2.05.1_linux.tar.gz/download' | tar xvz
+```
+$ # Download
+$ curl -L 'https://sourceforge.net/projects/astyle/files/astyle/astyle%202.05.1/astyle_2.05.1_linux.tar.gz/download' | tar xvz
 
-# Compile and install
-cd astyle/build/gcc && sudo make shared release shared static install
+$ # Compile and install
+$ cd astyle/build/gcc && sudo make shared release shared static install
+```
 
 ### Install Cppcheck
 ```
-git clone https://github.com/danmar/cppcheck.git
-cd cppcheck/
-git checkout 2.1 # or later version if available)
-mkdir build && cd build && cmake .. && cmake --build .
-sudo make MATCHCOMPILER=yes FILESDIR=/usr/share/cppcheck HAVE_RULES=yes CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function" install
+$ git clone https://github.com/danmar/cppcheck.git
+$ cd cppcheck/
+$ git checkout 2.1 # or later version if available)
+$ mkdir build && cd build && cmake .. && cmake --build .
+$ sudo make MATCHCOMPILER=yes FILESDIR=/usr/share/cppcheck HAVE_RULES=yes CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function" install
+```
+
+### Documentation
+
+To generate the user documentation an optional set of tools is necessary.
+
+* doxygen
+* plantuml
+* java (for plantuml)
+
+Call the doxygen helper from the project-root folder to create the documentation.
+```
+$ ./Documentation/doxygen.sh
 ```
 
 ### Implementation Details
@@ -210,12 +225,12 @@ intra-repo tool settings/configuration conflicts.
 During the bootstrap process, certain keys and aliases are defined
 that the runtime leverages.
 
-#####git config keys
+##### git config keys
 
 * mysensors.toolsdir = .mystools (defined as a repo-relative path - location agnostic)
 * mysensors.bootstrap-cksum = \<git sha of bootstrap-dev.sh used to detect an outdated environment>
 
-#####git aliases
+##### git aliases
 
 * mystoolspath = *returns the absolute path to the tools dir*
 * \<bundle name> = *(e.g. cppcheck) runs the tool bundle*

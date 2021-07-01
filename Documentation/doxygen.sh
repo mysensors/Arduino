@@ -2,6 +2,23 @@
 ## Invoke from project root, e.g Documentation/doxygen.sh
 result=0
 
+. .mystools/.bundle_runtime.sh
+
+is_installed "doxygen" || err "doxygen not found!"
+is_installed "java" || err "java not found!"
+
+# Find plantuml.jar. Using "which plantuml" is possible but we need the .jar file anyway.
+JAR_LIST=(/usr/share/java/plantuml.jar /usr/share/plantuml/plantuml.jar /usr/share/java/plantuml/plantuml.jar /usr/local/Cellar/plantuml/1.2021.1/libexec/plantuml.jar)
+for jar in "${JAR_LIST[@]}" ; do
+    if [ -f $jar ] ; then
+        export PLANTUML_JAR_PATH=$jar
+        break
+    fi
+done
+
+[ "$PLANTUML_JAR_PATH" != "" ] || err "plantuml not found!"
+
+
 # Generate doxygen file for Raspberry Pi configure command
 echo -e "/**\n * @defgroup RaspberryPiGateway Raspberry Pi Gateway\n * @ingroup MyConfigGrp\n * @brief Configuration options for the Raspberry Pi Gateway\n@{\n@verbatim" > configure.h
 ./configure --help >> configure.h
@@ -11,7 +28,6 @@ echo -e "@endverbatim\n@}*/\n" >> configure.h
 export PROJECTNUMBER=$(git fetch --tags; git describe --tags;)
 
 # Generate any UML diagrams in the code tree that has the proper tags
-export PLANTUML_JAR_PATH=Documentation/plantuml.jar
 java -Djava.awt.headless=true -jar $PLANTUML_JAR_PATH -failfast2 -nbthread auto -o "$PWD/Documentation/img" "./**.(c|cpp|dox|h|hpp|ino)"
 
 # Launch Doxygen (assumed to be in the PATH)
