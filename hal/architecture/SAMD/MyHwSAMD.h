@@ -20,7 +20,6 @@
 #define MyHwSAMD_h
 
 #include <SPI.h>
-#include <avr/dtostrf.h>
 
 #ifdef __cplusplus
 #include <Arduino.h>

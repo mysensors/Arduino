@@ -39,6 +39,16 @@ ISR (WDT_vect)
 }
 */
 
+// dtostrf is deprecated, adding missing function here
+char* dtostrf(double val, signed char width, unsigned char prec, char* sout)
+{
+	asm(".global _printf_float");
+
+	char fmt[20];
+	sprintf(fmt, "%%%d.%df", width, prec);
+	sprintf(sout, fmt, val);
+	return sout;
+}
 
 void hwReadConfigBlock(void *buf, void *addr, size_t length)
 {
