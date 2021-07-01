@@ -385,7 +385,9 @@ LOCAL void RF24_setNodeAddress(const uint8_t address)
 		// enable node pipe
 		RF24_setPipe(_BV(RF24_ERX_P0 + RF24_BROADCAST_PIPE) | _BV(RF24_ERX_P0));
 		// enable autoACK on pipe 0
+#ifndef MY_RF24_INVERTED_ACK
 		RF24_setAutoACK(_BV(RF24_ENAA_P0));
+#endif
 	}
 }
 

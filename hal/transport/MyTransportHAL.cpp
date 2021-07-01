@@ -173,7 +173,15 @@ bool transportHALSend(const uint8_t nextRecipient, const MyMessage *outMsg, cons
 	const uint8_t finalLength = len;
 #endif
 
+#ifdef MY_TRANSPORT_SEND_RETRIES
+	uint8_t retries = MY_TRANSPORT_RETRIES;
+	bool result = false; 
+	while (retries-- && (!result)) {
+		result = transportSend(nextRecipient, (void *)tx_data, finalLength, noACK);
+	}
+#else
 	bool result = transportSend(nextRecipient, (void *)tx_data, finalLength, noACK);
+#endif
 	TRANSPORT_HAL_DEBUG(PSTR("THA:SND:MSG LEN=%" PRIu8 ",RES=%" PRIu8 "\n"), finalLength, result);
 	return result;
 }
