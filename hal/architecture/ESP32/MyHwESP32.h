@@ -76,6 +76,9 @@
 #define hwRandomNumberInit() randomSeed(esp_random())
 #define hwGetSleepRemaining() (0ul)
 
+// experimental, not documented feature
+extern "C" int rom_phy_get_vdd33();
+
 bool hwInit(void);
 void hwReadConfigBlock(void *buf, void *addr, size_t length);
 void hwWriteConfigBlock(void *buf, void *addr, size_t length);

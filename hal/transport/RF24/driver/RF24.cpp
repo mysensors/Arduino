@@ -127,13 +127,15 @@ LOCAL uint8_t RF24_spiByteTransfer(const uint8_t cmd)
 LOCAL uint8_t RF24_RAW_readByteRegister(const uint8_t cmd)
 {
 	const uint8_t value = RF24_spiMultiByteTransfer(cmd, NULL, 1, true);
-	RF24_DEBUG(PSTR("RF24:RBR:REG=%" PRIu8 ",VAL=%" PRIu8 "\n"), cmd & RF24_REGISTER_MASK, value);
+	RF24_DEBUG(PSTR("RF24:RBR:REG=0x%02" PRIX8 ",VAL=0x%02" PRIX8 "\n"), cmd & RF24_REGISTER_MASK,
+	           value);
 	return value;
 }
 
 LOCAL uint8_t RF24_RAW_writeByteRegister(const uint8_t cmd, uint8_t value)
 {
-	RF24_DEBUG(PSTR("RF24:WBR:REG=%" PRIu8 ",VAL=%" PRIu8 "\n"), cmd & RF24_REGISTER_MASK, value);
+	RF24_DEBUG(PSTR("RF24:WBR:REG=0x%02" PRIX8 ",VAL=0x%02" PRIX8 "\n"), cmd & RF24_REGISTER_MASK,
+	           value);
 	return RF24_spiMultiByteTransfer( cmd, &value, 1, false);
 }
 
@@ -161,7 +163,12 @@ LOCAL uint8_t RF24_getFIFOStatus(void)
 
 LOCAL void RF24_setChannel(const uint8_t channel)
 {
-	RF24_writeByteRegister(RF24_REG_RF_CH,channel);
+	RF24_writeByteRegister(RF24_REG_RF_CH, channel);
+}
+
+LOCAL uint8_t RF24_getChannel(void)
+{
+	return RF24_readByteRegister(RF24_REG_RF_CH);
 }
 
 LOCAL void RF24_setRetries(const uint8_t retransmitDelay, const uint8_t retransmitCount)
@@ -209,6 +216,11 @@ LOCAL void RF24_setAutoACK(const uint8_t pipe)
 LOCAL void RF24_setDynamicPayload(const uint8_t pipe)
 {
 	RF24_writeByteRegister(RF24_REG_DYNPD, pipe);
+}
+
+LOCAL uint8_t RF24_getRFConfiguration(void)
+{
+	return RF24_readByteRegister(RF24_REG_NRF_CONFIG);
 }
 
 LOCAL void RF24_setRFConfiguration(const uint8_t configuration)
@@ -400,10 +412,15 @@ LOCAL bool RF24_sanityCheck(void)
 	return (RF24_readByteRegister(RF24_REG_RF_SETUP) == RF24_RF_SETUP) && (RF24_readByteRegister(
 	            RF24_REG_RF_CH) == MY_RF24_CHANNEL);
 }
+
+LOCAL uint8_t RF24_getRawTxPowerLevel(void)
+{
+	return (RF24_readByteRegister(RF24_REG_RF_SETUP) >> 1) & 3;
+}
 LOCAL int16_t RF24_getTxPowerLevel(void)
 {
 	// in dBm
-	return (int16_t)((-6) * (3-((RF24_readByteRegister(RF24_REG_RF_SETUP) >> 1) & 3)));
+	return (int16_t)((-6) * (3 - RF24_getRawTxPowerLevel()));
 }
 
 LOCAL uint8_t RF24_getTxPowerPercent(void)

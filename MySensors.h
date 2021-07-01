@@ -40,9 +40,19 @@
 #endif
 #include <stdint.h>
 
+#if defined(MY_DIAGNOSTICS)
+#if !defined(ARDUINO_ARCH_AVR)
+// more flash available
+#define MY_DIAGNOSTICS_CRYPTO
+#endif
+#define MY_DEBUG_VERBOSE_TRANSPORT
+#define MY_DEBUG_VERBOSE_TRANSPORT_HAL
+#define MY_SPECIAL_DEBUG
+#include "core/MyDiagnostics.h"
+#endif
+
 #include "MyConfig.h"
 #include "core/MyHelperFunctions.cpp"
-
 #include "core/MySplashScreen.h"
 #include "core/MySensorsCore.h"
 
@@ -442,6 +452,10 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #include "core/MyMessage.cpp"
 #include "core/MySplashScreen.cpp"
 #include "core/MySensorsCore.cpp"
+
+#if defined(MY_DIAGNOSTICS)
+#include "core/MyDiagnostics.cpp"
+#endif
 
 // HW mains
 #if defined(ARDUINO_ARCH_AVR)
