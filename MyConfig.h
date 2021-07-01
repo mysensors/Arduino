@@ -1161,6 +1161,15 @@
 #endif
 
 /**
+ * @def MY_TRANSPORT_SEND_RETRIES
+ * @brief If defined to a positive number N, the node will try to send the payload to the 
+ * uplink up to N times before actually failing. Useful when working in a noisy environment
+ * @note Setting this option too high will 
+ * 
+ */
+//#define MY_TRANSPORT_SEND_RETRIES (5)
+
+/**
  *@def MY_TRANSPORT_UPLINK_CHECK_DISABLED
  *@brief If defined, disables uplink check to GW during transport initialisation
  */
