@@ -1605,6 +1605,32 @@
 //#define MY_MQTT_CLIENT_KEY
 
 /**
+ * @def MY_MQTT_ETH_INIT_DELAY
+ * @brief Set a delay for Ethernet initialisation.
+ *
+ * This define is useful if you want to change default Ethernet chip initialisation
+ * delay time to other value. By default, it is 1000ms
+ * Example: @code #define MY_MQTT_ETH_INIT_DELAY 1 @endcode
+ */
+#ifndef MY_MQTT_ETH_INIT_DELAY
+#define MY_MQTT_ETH_INIT_DELAY 1000
+#endif
+/**
+ * @def MY_MQTT_ETH_CLIENT_CONNECTION_TIMEOUT
+ * @brief Set a MQTT broker socket connection timeout time.
+ *
+ * This define is useful if you want to change default MQTT TCP/IP broker
+ * connection timeout. By default, it is 1000ms.
+ *
+ * Note that this is not supported in ESP8266 and ESP32 platforms, sorry.
+ *
+ * Example: @code #define MY_MQTT_ETH_CLIENT_CONNECTION_TIMEOUT 1000 @endcode
+ */
+#ifndef MY_MQTT_ETH_CLIENT_CONNECTION_TIMEOUT
+#define MY_MQTT_ETH_CLIENT_CONNECTION_TIMEOUT 1000
+#endif
+
+/**
  * @def MY_IP_ADDRESS
  * @brief Static ip address of gateway. If not defined, DHCP will be used.
  *
@@ -2376,6 +2402,8 @@
 #define MY_MQTT_CA_CERT
 #define MY_MQTT_CLIENT_CERT
 #define MY_MQTT_CLIENT_KEY
+#define MY_MQTT_ETH_INIT_DELAY
+#define MY_MQTT_ETH_CLIENT_CONNECTION_TIMEOUT
 #define MY_SIGNAL_REPORT_ENABLED
 // general
 #define MY_WITH_LEDS_BLINKING_INVERSE

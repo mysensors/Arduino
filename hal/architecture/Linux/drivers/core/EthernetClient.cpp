@@ -33,11 +33,11 @@
 #include <errno.h>
 #include "log.h"
 
-EthernetClient::EthernetClient() : _sock(-1)
+EthernetClient::EthernetClient() : _sock(-1), socketTimeout(1000)
 {
 }
 
-EthernetClient::EthernetClient(int sock) : _sock(sock)
+EthernetClient::EthernetClient(int sock) : _sock(sock), socketTimeout(1000)
 {
 }
 
@@ -88,6 +88,13 @@ int EthernetClient::connect(const char* host, uint16_t port)
 			logError("connect: %s\n", strerror(errno));
 			continue;
 		}
+
+		// Sets the socket timeout
+		struct timeval timeout;
+		timeout.tv_sec = 0;
+		timeout.tv_usec = socketTimeout * 1000000;
+		setsockopt(_sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+		setsockopt(_sock, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(timeout));
 
 		break;
 	}

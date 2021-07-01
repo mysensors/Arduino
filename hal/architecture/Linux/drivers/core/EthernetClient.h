@@ -200,12 +200,21 @@ public:
 	{
 		return !this->operator==(rhs);
 	};
+	/**
+	 * @brief Set socket timeout.
+	 *
+	 */
+	void setConnectionTimeout(uint16_t timeoutInMilis)
+	{
+		socketTimeout = timeoutInMilis;
+	};
 
 	friend class EthernetServer;
 
 private:
 	int _sock; //!< @brief Network socket file descriptor.
 	IPAddress _srcip; //!< @brief Local ip to bind to.
+	uint16_t socketTimeout; //!< @brief Socket timeout in miliseconds.
 };
 
 #endif
