@@ -268,6 +268,52 @@
 //#define MY_RS485
 
 /**
+ * @def MY_CAN
+ * @brief Define this to use the CAN wired transport for sensor network communication.
+ */
+//#define MY_CAN
+/**
+ * @def MY_DEBUG_VERBOSE_CAN
+ * @brief Define this for verbose debug prints related to the %CAN driver.
+ */
+//#define MY_DEBUG_VERBOSE_CAN
+/**
+ * @def CAN_INT
+ * @brief Message arrived interrupt pin.
+ */
+#ifndef CAN_INT
+#define CAN_INT (2u)
+#endif
+/**
+ * @def CAN_CS
+ * @brief Chip select pin.
+ */
+#ifndef CAN_CS
+#define CAN_CS (10u)
+#endif
+/**
+ * @def CAN_SPEED
+ * @brief Baud rate. Allowed values can be found in mcp_can_dfs.h
+ */
+#ifndef CAN_SPEED
+#define CAN_SPEED CAN_250KBPS
+#endif
+/**
+ * @def CAN_CLOCK
+ * @brief can clock. Allowed values can be found in mcp_can_dfs.h
+ */
+#ifndef CAN_CLOCK
+#define CAN_CLOCK MCP_8MHZ
+#endif
+/**
+ * @def CAN_BUF_SIZE
+ * @brief assemble buffer size. Since long messages can be sliced and arrive mixed with other messages, assemble buffer is required.
+ */
+#ifndef CAN_BUF_SIZE
+#define CAN_BUF_SIZE (8u)
+#endif
+
+/**
  * @def MY_RS485_BAUD_RATE
  * @brief The RS485 BAUD rate.
  */
@@ -2275,7 +2321,7 @@
 #endif
 
 // Enable sensor network "feature" if one of the transport types was enabled
-#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485) || defined(MY_PJON)
+#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485) || defined(MY_PJON) || defined(MY_CAN)
 #define MY_SENSOR_NETWORK
 #endif
 
@@ -2443,6 +2489,9 @@
 // PJON
 #define MY_PJON
 #define MY_DEBUG_VERBOSE_PJON
+// CAN
+#define MY_CAN
+#define MY_DEBUG_VERBOSE_CAN
 // RF24
 #define MY_RADIO_RF24
 #define MY_RADIO_NRF24 //deprecated

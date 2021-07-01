@@ -61,6 +61,9 @@
 #if defined(MY_RS485)
 #error Receive message buffering not supported for RS485!
 #endif
+#if defined(MY_CAN)
+#error Receive message buffering not supported for CAN!
+#endif
 #elif defined(MY_RX_MESSAGE_BUFFER_SIZE)
 #error Receive message buffering requires message buffering feature enabled!
 #endif
